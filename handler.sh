@@ -10,8 +10,10 @@ ACPI_Event() {
     power)
       case $2 in
         button) _Poweroff ;;
+        ac) su $user -l -c "DISPLAY=:0.0 ${userhome}/bin/power" ;;
       esac
       ;;
+
      volume)
        case $2 in
          output)
@@ -23,12 +25,8 @@ ACPI_Event() {
            ;;
        esac
        ;;
-    tablet)
-      su $user -l -c "DISPLAY=:0.0 ${userhome}/bin/display tabletmode"
-      ;;
-     ac-adapter)
-       su $user -l -c "DISPLAY=:0.0 ${userhome}/bin/power"
-       ;;
+
+    tablet) su $user -l -c "DISPLAY=:0.0 ${userhome}/bin/display tabletmode" ;;
    esac
 }
 
@@ -39,16 +37,14 @@ case "$@" in
   button/volumedown*)             ACPI_Event volume output down ;;
   button/mute*)                   ACPI_Event volume output mute ;;
   video/tabletmode*TBLT*)         ACPI_Event tablet ;;
-  ibm/hotkey*LEN0068:00*00006030) ACPI_EVENT ac-adapter ;;
-#  ibm/hotkey*LEN0068:00*0000500c) ACPI_EVENT stylus eject ;;
-#  ibm/hotkey*LEN0068:00*0000500b) ACPI_EVENT stylus replace ;;
+  ibm/hotkey\ LEN0068:00*6030)    ACPI_Event power ac ;;
+#  ibm/hotkey\ LEN0068:00*500c) ACPI_EVENT stylus eject ;;
+#  ibm/hotkey\ LEN0068:00*500b) ACPI_EVENT stylus replace ;;
 esac
- 
- 
+
+
 _Poweroff() {
   /sbin/shutdown -h -P now "Power button pressed"
 }
-
-
 
 # vim:set ts=4 sw=4 ft=sh et:
